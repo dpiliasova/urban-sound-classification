@@ -73,9 +73,16 @@ def augment_spectrogram(
 class MelSpectrogramCache:
     """Extract each log-mel spectrogram once and reuse it across fold runs."""
 
-    def __init__(self, cache_dir: Path, config: AudioConfig) -> None:
+    def __init__(
+        self,
+        cache_dir: Path,
+        config: AudioConfig,
+        keep_in_memory: bool = False,
+    ) -> None:
         self.cache_dir = cache_dir
         self.config = config
+        self.keep_in_memory = keep_in_memory
+        self._memory: dict[str, torch.Tensor] = {}
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
     def _cache_path(self, audio_path: Path) -> Path:
@@ -88,14 +95,27 @@ class MelSpectrogramCache:
 
     def get(self, audio_path: Path) -> torch.Tensor:
         cache_path = self._cache_path(audio_path)
+        cache_key = cache_path.name
+        if cache_key in self._memory:
+            return self._memory[cache_key]
+
         if cache_path.exists():
-            return torch.load(cache_path, map_location="cpu", weights_only=True)
+            spectrogram = torch.load(cache_path, map_location="cpu", weights_only=True)
+            if self.keep_in_memory:
+                self._memory[cache_key] = spectrogram
+            return spectrogram
 
         spectrogram = self._extract(audio_path)
         temporary_path = cache_path.with_suffix(f".{os.getpid()}.tmp")
         torch.save(spectrogram, temporary_path)
         os.replace(temporary_path, cache_path)
+        if self.keep_in_memory:
+            self._memory[cache_key] = spectrogram
         return spectrogram
+
+    @property
+    def in_memory_items(self) -> int:
+        return len(self._memory)
 
     def _extract(self, audio_path: Path) -> torch.Tensor:
         if not audio_path.exists():

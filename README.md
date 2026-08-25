@@ -104,7 +104,9 @@ Run the final rotating-fold protocol after the configuration is fixed:
 ```bash
 urban-sound cross-validate \
   --data-root data/UrbanSound8K \
-  --output-dir artifacts/cv
+  --output-dir artifacts/cv \
+  --cache-dir data/cache \
+  --preload-features
 ```
 
 For a quick pipeline check, limit each split:
@@ -124,6 +126,10 @@ Run code quality checks:
 python -m ruff check .
 python -m pytest -q
 ```
+
+The first corrected GPU experiment is configured as a private Kaggle kernel in
+[`kaggle/`](kaggle/). It runs the fixed development split before the more
+expensive ten-fold evaluation.
 
 ## Key findings
 

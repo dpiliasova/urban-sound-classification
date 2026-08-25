@@ -1,0 +1,28 @@
+# Kaggle GPU run
+
+`dev_run.py` performs the first fresh experiment after the preprocessing audit:
+
+- clones the current public project;
+- locates the attached UrbanSound8K dataset without relying on one fixed mount
+  path;
+- preloads one shared copy of the corrected spectrogram features;
+- trains on folds 1–8, selects the checkpoint on fold 9, and evaluates fold 10;
+- records the Git commit, package versions, GPU, runtime, metrics, predictions,
+  history, confusion matrix, and best checkpoint;
+- removes the temporary feature cache only after a successful run.
+
+The Kaggle kernel is private until the corrected run has completed and its
+outputs have been reviewed.
+
+Upload a new version with the Kaggle CLI:
+
+```bash
+kaggle kernels push -p kaggle
+```
+
+Check its state and download outputs:
+
+```bash
+kaggle kernels status dpiliasova/urbansound8k-corrected-dev-run
+kaggle kernels output dpiliasova/urbansound8k-corrected-dev-run -p artifacts/kaggle-dev
+```

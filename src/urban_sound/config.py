@@ -34,6 +34,7 @@ class TrainingConfig:
     finetune_mixup_alpha: float = 0.2
     patience: int = 15
     num_workers: int = 4
+    use_amp: bool = True
 
 
 def save_config(path: Path, audio: AudioConfig, training: TrainingConfig) -> None:

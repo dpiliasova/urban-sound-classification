@@ -7,6 +7,7 @@ from pathlib import Path
 import pandas as pd
 import torch
 from torch.utils.data import Dataset
+from tqdm.auto import tqdm
 
 from urban_sound.config import AudioConfig
 from urban_sound.features import MelSpectrogramCache, augment_spectrogram, normalize_spectrogram
@@ -58,24 +59,41 @@ class UrbanSoundDataset(Dataset[tuple[torch.Tensor, int]]):
         audio_root: Path,
         cache: MelSpectrogramCache,
         augment: bool = False,
+        preload: bool = False,
     ) -> None:
         self.records = metadata.to_dict(orient="records")
         self.audio_root = audio_root
         self.cache = cache
         self.augment = augment
+        self.spectrograms: list[torch.Tensor] | None = None
+        if preload:
+            self.spectrograms = [
+                self.cache.get(self._audio_path(row))
+                for row in tqdm(self.records, desc="Loading spectrograms", leave=False)
+            ]
 
     def __len__(self) -> int:
         return len(self.records)
 
     def __getitem__(self, index: int) -> tuple[torch.Tensor, int]:
         row = self.records[index]
-        audio_path = self.audio_root / f"fold{int(row['fold'])}" / str(row["slice_file_name"])
-        spectrogram = normalize_spectrogram(self.cache.get(audio_path))
+        if self.spectrograms is None:
+            spectrogram = self.cache.get(self._audio_path(row))
+        else:
+            spectrogram = self.spectrograms[index]
+        spectrogram = normalize_spectrogram(spectrogram)
         if self.augment:
             spectrogram = augment_spectrogram(spectrogram)
         spectrogram = spectrogram.repeat(3, 1, 1)
         return spectrogram, int(row["classID"])
 
+    def _audio_path(self, row: dict[str, object]) -> Path:
+        return self.audio_root / f"fold{int(row['fold'])}" / str(row["slice_file_name"])
 
-def make_cache(data_root: Path, audio_config: AudioConfig) -> MelSpectrogramCache:
-    return MelSpectrogramCache(data_root.parent / "cache", audio_config)
+
+def make_cache(
+    cache_dir: Path,
+    audio_config: AudioConfig,
+    keep_in_memory: bool = False,
+) -> MelSpectrogramCache:
+    return MelSpectrogramCache(cache_dir, audio_config, keep_in_memory=keep_in_memory)

@@ -17,6 +17,8 @@
     "label_smoothing": 0.1,
     "head_mixup_alpha": 0.3,
     "finetune_mixup_alpha": 0.2,
-    "patience": 15
+    "patience": 15,
+    "num_workers": 4,
+    "use_amp": true
   }
 }

@@ -1,0 +1,15 @@
+{
+  "id": "dpiliasova/urbansound8k-corrected-dev-run",
+  "title": "UrbanSound8K Corrected DenseNet Dev Run",
+  "code_file": "dev_run.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_internet": "true",
+  "dataset_sources": [
+    "chrisfilo/urbansound8k"
+  ],
+  "competition_sources": [],
+  "kernel_sources": []
+}

@@ -72,6 +72,8 @@ def train_epoch(
     optimizer: torch.optim.Optimizer,
     device: torch.device,
     mixup_alpha: float,
+    scaler: torch.cuda.amp.GradScaler,
+    use_amp: bool,
 ) -> tuple[float, float]:
     model.train()
     total_loss = 0.0
@@ -84,11 +86,16 @@ def train_epoch(
         mixed, targets_a, targets_b, weight = mixup_batch(inputs, targets, mixup_alpha)
 
         optimizer.zero_grad(set_to_none=True)
-        logits = model(mixed)
-        loss = weight * criterion(logits, targets_a) + (1.0 - weight) * criterion(logits, targets_b)
-        loss.backward()
+        with torch.autocast(device_type=device.type, enabled=use_amp):
+            logits = model(mixed)
+            loss = weight * criterion(logits, targets_a) + (1.0 - weight) * criterion(
+                logits, targets_b
+            )
+        scaler.scale(loss).backward()
+        scaler.unscale_(optimizer)
         nn.utils.clip_grad_norm_(model.parameters(), max_norm=5.0)
-        optimizer.step()
+        scaler.step(optimizer)
+        scaler.update()
 
         predictions = logits.argmax(dim=1)
         batch_size = inputs.shape[0]
@@ -105,6 +112,7 @@ def evaluate(
     loader: DataLoader,
     criterion: nn.Module,
     device: torch.device,
+    use_amp: bool = False,
 ) -> EvaluationResult:
     model.eval()
     total_loss = 0.0
@@ -116,9 +124,10 @@ def evaluate(
         for inputs, targets in loader:
             inputs = inputs.to(device, non_blocking=True)
             targets = targets.to(device, non_blocking=True)
-            logits = model(inputs)
-            probabilities = torch.softmax(logits, dim=1)
-            loss = criterion(logits, targets)
+            with torch.autocast(device_type=device.type, enabled=use_amp):
+                logits = model(inputs)
+                loss = criterion(logits, targets)
+            probabilities = torch.softmax(logits.float(), dim=1)
 
             total_loss += float(loss.item()) * inputs.shape[0]
             targets_all.extend(targets.cpu().tolist())
@@ -161,6 +170,8 @@ def fit_two_stage(
 ) -> tuple[list[EpochMetrics], float]:
     """Fit the head, then the full network; restore the best validation checkpoint."""
     criterion = nn.CrossEntropyLoss(label_smoothing=config.label_smoothing)
+    amp_enabled = config.use_amp and device.type == "cuda"
+    scaler = torch.cuda.amp.GradScaler(enabled=amp_enabled)
     history: list[EpochMetrics] = []
     best_accuracy = -1.0
     best_state: dict[str, torch.Tensor] | None = None
@@ -179,8 +190,10 @@ def fit_two_stage(
             head_optimizer,
             device,
             config.head_mixup_alpha,
+            scaler,
+            amp_enabled,
         )
-        validation = evaluate(model, validation_loader, criterion, device)
+        validation = evaluate(model, validation_loader, criterion, device, amp_enabled)
         history.append(
             EpochMetrics(
                 "head",
@@ -193,6 +206,12 @@ def fit_two_stage(
         )
         best_accuracy, best_state, _ = _update_best(
             model, validation.accuracy, best_accuracy, best_state
+        )
+        print(
+            f"[head {epoch:02d}/{config.head_epochs}] "
+            f"train_loss={train_loss:.4f} train_acc={train_accuracy:.4f} "
+            f"val_loss={validation.loss:.4f} val_acc={validation.accuracy:.4f}",
+            flush=True,
         )
 
     model.unfreeze_backbone()
@@ -212,8 +231,10 @@ def fit_two_stage(
             optimizer,
             device,
             config.finetune_mixup_alpha,
+            scaler,
+            amp_enabled,
         )
-        validation = evaluate(model, validation_loader, criterion, device)
+        validation = evaluate(model, validation_loader, criterion, device, amp_enabled)
         scheduler.step()
         history.append(
             EpochMetrics(
@@ -227,6 +248,13 @@ def fit_two_stage(
         )
         best_accuracy, best_state, improved = _update_best(
             model, validation.accuracy, best_accuracy, best_state
+        )
+        print(
+            f"[finetune {epoch:02d}/{config.finetune_epochs}] "
+            f"train_loss={train_loss:.4f} train_acc={train_accuracy:.4f} "
+            f"val_loss={validation.loss:.4f} val_acc={validation.accuracy:.4f} "
+            f"best={best_accuracy:.4f}",
+            flush=True,
         )
         if improved:
             epochs_without_improvement = 0
