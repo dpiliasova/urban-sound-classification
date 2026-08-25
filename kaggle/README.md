@@ -23,6 +23,6 @@ kaggle kernels push -p kaggle
 Check its state and download outputs:
 
 ```bash
-kaggle kernels status dpiliasova/urbansound8k-corrected-dev-run
-kaggle kernels output dpiliasova/urbansound8k-corrected-dev-run -p artifacts/kaggle-dev
+kaggle kernels status dashapilyasova/urbansound8k-corrected-dev-run
+kaggle kernels output dashapilyasova/urbansound8k-corrected-dev-run -p artifacts/kaggle-dev
 ```
