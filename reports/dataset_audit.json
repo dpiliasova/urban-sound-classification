@@ -1,0 +1,39 @@
+{
+  "dataset": "UrbanSound8K",
+  "metadata_rows": 8732,
+  "unique_source_ids": 1297,
+  "source_ids_assigned_to_multiple_folds": 5,
+  "exceptions": [
+    {
+      "fsID": 77751,
+      "folds": [2, 7],
+      "classes": ["drilling", "jackhammer"]
+    },
+    {
+      "fsID": 106905,
+      "folds": [1, 8],
+      "classes": ["engine_idling", "siren"]
+    },
+    {
+      "fsID": 132016,
+      "folds": [1, 4],
+      "classes": ["jackhammer", "street_music"]
+    },
+    {
+      "fsID": 176638,
+      "folds": [1, 4],
+      "classes": ["car_horn", "engine_idling"]
+    },
+    {
+      "fsID": 180937,
+      "folds": [1, 9],
+      "classes": ["drilling", "jackhammer"]
+    }
+  ],
+  "fixed_dev_split_overlap": {
+    "train_folds": [1, 2, 3, 4, 5, 6, 7, 8],
+    "validation_fold": 9,
+    "test_fold": 10,
+    "cross_split_source_ids": [180937]
+  }
+}

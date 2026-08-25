@@ -1,7 +1,12 @@
 import pandas as pd
 import pytest
 
-from urban_sound.splits import assert_source_disjoint, limit_split, split_metadata
+from urban_sound.splits import (
+    assert_source_disjoint,
+    limit_split,
+    source_overlap_ids,
+    split_metadata,
+)
 
 
 def _metadata() -> pd.DataFrame:
@@ -32,6 +37,12 @@ def test_source_overlap_is_rejected():
     second = pd.DataFrame({"fsID": [2, 3]})
     with pytest.raises(ValueError, match="leakage"):
         assert_source_disjoint(first, second)
+
+
+def test_source_overlap_can_be_reported_without_changing_official_folds():
+    first = pd.DataFrame({"fsID": [1, 2]})
+    second = pd.DataFrame({"fsID": [2, 3]})
+    assert source_overlap_ids(first, second) == {2}
 
 
 def test_smoke_limit_retains_classes_when_space_allows():

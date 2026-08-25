@@ -40,7 +40,10 @@ def validate_metadata(metadata: pd.DataFrame) -> None:
 
 
 def split_metadata(
-    metadata: pd.DataFrame, test_fold: int, val_fold: int
+    metadata: pd.DataFrame,
+    test_fold: int,
+    val_fold: int,
+    strict_source_check: bool = False,
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Split metadata using only the official fold assignments."""
     validate_metadata(metadata)
@@ -48,23 +51,31 @@ def split_metadata(
     train = metadata[metadata["fold"].isin(train_folds)].reset_index(drop=True)
     validation = metadata[metadata["fold"] == val_fold].reset_index(drop=True)
     test = metadata[metadata["fold"] == test_fold].reset_index(drop=True)
-    assert_source_disjoint(train, validation, test)
+    if strict_source_check:
+        assert_source_disjoint(train, validation, test)
     return train, validation, test
+
+
+def source_overlap_ids(*splits: pd.DataFrame) -> set[int]:
+    """Return source IDs appearing in more than one split."""
+    if not splits or any("fsID" not in split.columns for split in splits):
+        return set()
+
+    seen: set[int] = set()
+    overlaps: set[int] = set()
+    for split in splits:
+        source_ids = set(int(value) for value in split["fsID"].unique())
+        overlaps.update(seen.intersection(source_ids))
+        seen.update(source_ids)
+    return overlaps
 
 
 def assert_source_disjoint(*splits: pd.DataFrame) -> None:
     """Check that source recordings do not cross splits when `fsID` is available."""
-    if not splits or any("fsID" not in split.columns for split in splits):
-        return
-
-    seen: set[int] = set()
-    for split in splits:
-        source_ids = set(int(value) for value in split["fsID"].unique())
-        overlap = seen.intersection(source_ids)
-        if overlap:
-            preview = sorted(overlap)[:5]
-            raise ValueError(f"Source-recording leakage detected for fsID values: {preview}")
-        seen.update(source_ids)
+    overlaps = source_overlap_ids(*splits)
+    if overlaps:
+        preview = sorted(overlaps)[:5]
+        raise ValueError(f"Source-recording leakage detected for fsID values: {preview}")
 
 
 def limit_split(metadata: pd.DataFrame, maximum: int | None) -> pd.DataFrame:

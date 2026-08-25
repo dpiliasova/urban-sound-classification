@@ -7,10 +7,15 @@ goal is multiclass classification from at most four seconds of audio. Each
 prediction uses only the target clip; no filename, fold identifier, source ID,
 or other metadata enters the model.
 
-The dataset authors provide ten folds that keep excerpts from the same source
-recording together. The project preserves those folds because randomly moving
-clips between splits could place related excerpts in training and testing and
-inflate quality.
+The dataset authors provide ten folds designed to reduce source-recording
+leakage. The project preserves those folds because random reassignment would be
+less defensible and would make results hard to compare with published work.
+
+A metadata audit nevertheless found five `fsID` values assigned to two folds
+each. In every case the same source ID is used under different class labels
+(`drilling`/`jackhammer`, `siren`/`engine_idling`, or similar). The official
+protocol is retained for comparability, but every experiment now records which
+of these dataset-level exceptions cross its train, validation, and test splits.
 
 ## Validation protocol
 

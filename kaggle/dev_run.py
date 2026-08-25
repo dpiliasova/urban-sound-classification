@@ -20,6 +20,8 @@ PROJECT_ROOT = WORKING_ROOT / "urban-sound-classification"
 OUTPUT_DIR = WORKING_ROOT / "corrected_dev_run"
 CACHE_DIR = WORKING_ROOT / "spectrogram_cache"
 REPOSITORY_URL = "https://github.com/dpiliasova/urban-sound-classification.git"
+COMPATIBLE_TORCH_VERSION = "2.7.1"
+COMPATIBLE_TORCHVISION_VERSION = "0.22.1"
 
 
 def run(command: list[str], cwd: Path | None = None) -> str:
@@ -60,8 +62,51 @@ def package_versions() -> dict[str, str]:
     return versions
 
 
+def ensure_gpu_compatible_pytorch() -> None:
+    """Downgrade only when Kaggle assigns a GPU unsupported by its current wheel."""
+    import torch
+
+    if not torch.cuda.is_available():
+        return
+    major, minor = torch.cuda.get_device_capability(0)
+    required_architecture = f"sm_{major}{minor}"
+    compiled_architectures = set(torch.cuda.get_arch_list())
+    if required_architecture in compiled_architectures:
+        return
+    if os.environ.get("URBAN_SOUND_TORCH_RESTARTED") == "1":
+        raise RuntimeError(
+            f"Installed PyTorch still does not support {required_architecture}: "
+            f"{sorted(compiled_architectures)}"
+        )
+
+    print(
+        f"PyTorch {torch.__version__} does not support {required_architecture}; "
+        f"installing torch {COMPATIBLE_TORCH_VERSION} for the assigned GPU.",
+        flush=True,
+    )
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pip",
+            "install",
+            "--no-cache-dir",
+            "--upgrade",
+            f"torch=={COMPATIBLE_TORCH_VERSION}",
+            f"torchvision=={COMPATIBLE_TORCHVISION_VERSION}",
+            "--index-url",
+            "https://download.pytorch.org/whl/cu126",
+        ],
+        check=True,
+    )
+    environment = os.environ.copy()
+    environment["URBAN_SOUND_TORCH_RESTARTED"] = "1"
+    os.execve(sys.executable, [sys.executable, str(Path(__file__).resolve())], environment)
+
+
 def main() -> None:
     started_at = time.time()
+    ensure_gpu_compatible_pytorch()
     if PROJECT_ROOT.exists():
         shutil.rmtree(PROJECT_ROOT)
     run(["git", "clone", "--depth", "1", REPOSITORY_URL, str(PROJECT_ROOT)])

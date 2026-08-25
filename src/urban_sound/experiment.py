@@ -17,7 +17,13 @@ from urban_sound.config import AudioConfig, TrainingConfig, save_config
 from urban_sound.data import CLASS_NAMES, UrbanSoundDataset, make_cache, read_metadata
 from urban_sound.features import MelSpectrogramCache
 from urban_sound.model import UrbanSoundDenseNet
-from urban_sound.splits import ALL_FOLDS, limit_split, next_validation_fold, split_metadata
+from urban_sound.splits import (
+    ALL_FOLDS,
+    limit_split,
+    next_validation_fold,
+    source_overlap_ids,
+    split_metadata,
+)
 from urban_sound.training import evaluate, fit_two_stage, seed_worker, set_reproducible_seed
 
 
@@ -119,6 +125,12 @@ def run_fold(
 
     metadata, audio_root = read_metadata(data_root)
     train_frame, validation_frame, test_frame = split_metadata(metadata, test_fold, val_fold)
+    overlapping_sources = sorted(source_overlap_ids(train_frame, validation_frame, test_frame))
+    if overlapping_sources:
+        print(
+            f"Official-fold metadata exceptions: source IDs cross splits: {overlapping_sources}",
+            flush=True,
+        )
     train_frame = limit_split(train_frame, max_samples_per_split)
     validation_frame = limit_split(validation_frame, max_samples_per_split)
     test_frame = limit_split(test_frame, max_samples_per_split)
@@ -200,6 +212,8 @@ def run_fold(
         "device": str(device),
         "mixed_precision": amp_enabled,
         "preprocessing": "normalize_then_mask_v2",
+        "source_overlap_count": len(overlapping_sources),
+        "source_overlap_ids": overlapping_sources,
         "classification_report": report,
     }
     (output_dir / "metrics.json").write_text(json.dumps(metrics, indent=2), encoding="utf-8")

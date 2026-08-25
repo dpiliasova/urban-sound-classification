@@ -10,7 +10,8 @@ backbone using the dataset's official, source-safe folds.
 
 The project focuses on experimental validity as much as model quality:
 
-- official folds are preserved to prevent source-recording leakage;
+- official folds are preserved instead of random reassignment, and rare
+  cross-fold source-ID exceptions in the published metadata are reported;
 - architecture selection uses a fixed development split;
 - final evaluation rotates test and validation folds across all ten folds;
 - preprocessing is cached, reproducible, and independent of Kaggle paths;
@@ -38,6 +39,8 @@ historical score to the corrected implementation.
 
 See [the experiment report](reports/model_analysis.md) for fold-level results,
 class metrics, methodological decisions, and limitations.
+The machine-readable [dataset audit](reports/dataset_audit.json) documents the
+five cross-fold source-ID exceptions found in the published metadata.
 
 ## Modelling approach
 
@@ -135,6 +138,9 @@ expensive ten-fold evaluation.
 
 - Performance varies materially between official folds, confirming that a
   single random split would be an incomplete evaluation.
+- The metadata audit found five source IDs assigned to multiple official folds,
+  always under different class labels. The standard folds are retained for
+  benchmark comparability, while each run records overlap IDs explicitly.
 - On the fixed test fold, `children_playing` and `jackhammer` have high recall
   but lower precision, while `dog_bark` and `drilling` are among the lower-recall
   classes.
