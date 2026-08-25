@@ -67,6 +67,7 @@ def main() -> None:
     run(["git", "clone", "--depth", "1", REPOSITORY_URL, str(PROJECT_ROOT)])
     commit = run(["git", "rev-parse", "HEAD"], cwd=PROJECT_ROOT).splitlines()[-1]
     run([sys.executable, "-m", "pip", "install", "--no-deps", "-e", str(PROJECT_ROOT)])
+    sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
     from urban_sound.config import AudioConfig, TrainingConfig
     from urban_sound.experiment import run_fold
