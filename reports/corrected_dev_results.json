@@ -1,0 +1,43 @@
+{
+  "status": "fresh_corrected_gpu_run",
+  "kaggle_kernel": "dashapilyasova/urbansound8k-corrected-densenet-dev-run",
+  "project_commit": "33b4e69b5651bdb9cb86675c4e719b0dc1310b23",
+  "preprocessing": "normalize_then_mask_v2",
+  "runtime": {
+    "gpu": "Tesla P100-PCIE-16GB",
+    "torch": "2.7.1+cu126",
+    "mixed_precision": true,
+    "elapsed_minutes": 19.741106855869294
+  },
+  "split": {
+    "train_folds": [1, 2, 3, 4, 5, 6, 7, 8],
+    "validation_fold": 9,
+    "test_fold": 10,
+    "train_samples": 7079,
+    "validation_samples": 816,
+    "test_samples": 837,
+    "cross_split_source_ids": [180937]
+  },
+  "best_checkpoint": {
+    "stage": "finetune",
+    "epoch": 15,
+    "validation_accuracy": 0.8713235294117647
+  },
+  "training_stopped_after_finetune_epoch": 30,
+  "test_accuracy": 0.8530465949820788,
+  "test_loss": 0.8611073965382547,
+  "macro_f1": 0.8604623589071034,
+  "weighted_f1": 0.8516716567492509,
+  "class_metrics": {
+    "air_conditioner": {"precision": 0.8585858585858586, "recall": 0.85, "f1": 0.8542713567839196, "support": 100},
+    "car_horn": {"precision": 0.9642857142857143, "recall": 0.8181818181818182, "f1": 0.8852459016393442, "support": 33},
+    "children_playing": {"precision": 0.7045454545454546, "recall": 0.93, "f1": 0.8017241379310345, "support": 100},
+    "dog_bark": {"precision": 0.8217821782178217, "recall": 0.83, "f1": 0.8258706467661692, "support": 100},
+    "drilling": {"precision": 0.9195402298850575, "recall": 0.8, "f1": 0.8556149732620321, "support": 100},
+    "engine_idling": {"precision": 0.9620253164556962, "recall": 0.8172043010752689, "f1": 0.8837209302325582, "support": 93},
+    "gun_shot": {"precision": 1.0, "recall": 0.9375, "f1": 0.967741935483871, "support": 32},
+    "jackhammer": {"precision": 0.8275862068965517, "recall": 1.0, "f1": 0.9056603773584906, "support": 96},
+    "siren": {"precision": 0.9803921568627451, "recall": 0.6024096385542169, "f1": 0.746268656716418, "support": 83},
+    "street_music": {"precision": 0.8245614035087719, "recall": 0.94, "f1": 0.8785046728971962, "support": 100}
+  }
+}

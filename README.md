@@ -19,23 +19,29 @@ The project focuses on experimental validity as much as model quality:
 
 ## Results
 
-The coursework experiment recorded the following results:
+The corrected pipeline has now been rerun on the fixed development split. The
+more expensive corrected ten-fold evaluation is running separately.
 
 | Evaluation | Accuracy |
 |---|---:|
-| Fixed dev split: folds 1–8 train, 9 validation, 10 test | **84.71%** |
-| Official 10-fold evaluation | **81.10% ± 4.02%** |
+| Corrected fixed dev split: folds 1–8 train, 9 validation, 10 test | **85.30%** |
+| Historical coursework dev split | 84.71% |
+| Historical coursework 10-fold evaluation | **81.10% ± 4.02%** |
 | Best / weakest test fold | 86.26% / 72.22% |
 
 ![Accuracy by official fold](reports/figures/fold_accuracy.svg)
 
-The 10-fold result is retained as a **historical coursework result** rather than
+The 10-fold result remains a **historical coursework result** rather than
 presented as a rerun of the refactored package. During the portfolio audit, the
 SpecAugment order was corrected: the original notebook inserted zero-valued
 masks before per-example normalization, although zero is the maximum of a
 decibel-scaled spectrogram. The package now normalizes first and then masks with
 the normalized mean (`0`). A fresh GPU run is required before attaching the
-historical score to the corrected implementation.
+historical score to the corrected implementation. The fresh corrected dev run
+improved accuracy by `0.59` percentage points and is documented in
+[`corrected_dev_results.json`](reports/corrected_dev_results.json).
+
+![Corrected fixed-split confusion matrix](reports/figures/corrected_dev_confusion_matrix.png)
 
 See [the experiment report](reports/model_analysis.md) for fold-level results,
 class metrics, methodological decisions, and limitations.
@@ -150,7 +156,8 @@ expensive ten-fold evaluation.
 
 ## Limitations
 
-- the corrected preprocessing pipeline still needs a full GPU rerun;
+- corrected ten-fold results are not yet available; only the fixed split has
+  completed a fresh GPU run;
 - only one random seed was recorded for the historical experiment;
 - ImageNet features are transferred from images rather than learned from audio;
 - spectrograms are repeated across RGB channels instead of using an audio-native

@@ -63,18 +63,21 @@ about augmentation gains are intentionally avoided.
 
 ## Fixed-split error analysis
 
-The development test fold reached 84.71% accuracy and 84.93% weighted F1.
+The corrected GPU rerun reached **85.30% accuracy**, 86.05% macro F1, and
+85.17% weighted F1. This is a 0.59 percentage-point improvement over the
+historical 84.71% coursework result on the same fold assignment. The best
+checkpoint was selected at fine-tuning epoch 15 with 87.13% validation
+accuracy; early stopping ended training after epoch 30.
 
-- `gun_shot` was the strongest class: 96.88% precision and recall, but only 32
-  test examples were available.
-- `children_playing` reached 92.00% recall but 65.25% precision, indicating
-  substantial overprediction.
-- `jackhammer` showed a similar pattern: 93.75% recall and 74.38% precision.
-- `drilling` and `dog_bark` had lower recall, at 73.00% and 75.00%.
-- The original confusion-matrix review suggested plausible confusion among
-  sustained mechanical sounds (`drilling`, `jackhammer`, `engine_idling`, and
-  `air_conditioner`). Saved per-example predictions in the refactored runner
-  make this claim directly reproducible on the next run.
+- `gun_shot` retained the strongest F1 at 96.77%, but only 32 test examples
+  were available.
+- `jackhammer` reached 100% recall and improved precision from 74.38% to 82.76%.
+- `drilling` recall improved from 73% to 80%, and `dog_bark` from 75% to 83%.
+- `children_playing` still showed overprediction: 93% recall and 70.45%
+  precision, although precision improved from 65.25%.
+- `siren` became the main weakness: precision was 98.04%, but recall dropped to
+  60.24%. The full ten-fold run is required to determine whether this is
+  specific to fold 10 or a systematic trade-off.
 
 ## Portfolio audit and correction
 
@@ -88,8 +91,8 @@ pipeline now:
 3. applies masks with the normalized mean, zero.
 
 The old 81.10% result therefore documents the original experiment, not a claim
-that the corrected package has already reproduced it. A fresh ten-fold GPU run
-is the next required experiment.
+that the corrected package has already reproduced it. The corrected fixed-split
+run has completed; a fresh ten-fold GPU run is the next required experiment.
 
 ## Limitations and next experiments
 

@@ -1,0 +1,15 @@
+{
+  "id": "dashapilyasova/urbansound8k-corrected-10-fold-cv",
+  "title": "UrbanSound8K Corrected 10 Fold CV",
+  "code_file": "cv_run.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_internet": "true",
+  "dataset_sources": [
+    "chrisfilo/urbansound8k"
+  ],
+  "competition_sources": [],
+  "kernel_sources": []
+}
