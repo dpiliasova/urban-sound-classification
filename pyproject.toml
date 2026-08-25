@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "urban-sound-classification"
+version = "0.1.0"
+description = "Leakage-safe UrbanSound8K classification with log-mel spectrograms and DenseNet121"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+  { name = "Daria Piliasova", email = "209709110+dpiliasova@users.noreply.github.com" },
+]
+dependencies = [
+  "librosa>=0.10,<0.12",
+  "matplotlib>=3.8,<4",
+  "numpy>=1.26,<3",
+  "pandas>=2.1,<3",
+  "scikit-learn>=1.4,<2",
+  "soundfile>=0.12,<1",
+  "torch>=2.2,<3",
+  "torchvision>=0.17,<1",
+  "tqdm>=4.66,<5",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8,<9",
+  "ruff>=0.9,<1",
+]
+
+[project.scripts]
+urban-sound = "urban_sound.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]

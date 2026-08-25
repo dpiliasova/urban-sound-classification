@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="450" viewBox="0 0 900 450" role="img" aria-labelledby="title desc">
+  <title id="title">UrbanSound8K accuracy by official fold</title>
+  <desc id="desc">Bar chart of ten fold accuracies with a mean of 81.10 percent.</desc>
+  <rect width="900" height="450" fill="#ffffff"/>
+  <text x="450" y="28" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="700" fill="#182230">Accuracy by official test fold</text>
+  <g stroke="#dbe3ea" stroke-width="1">
+    <line x1="70" y1="370" x2="865" y2="370"/>
+    <line x1="70" y1="306" x2="865" y2="306"/>
+    <line x1="70" y1="242" x2="865" y2="242"/>
+    <line x1="70" y1="178" x2="865" y2="178"/>
+    <line x1="70" y1="114" x2="865" y2="114"/>
+    <line x1="70" y1="50" x2="865" y2="50"/>
+  </g>
+  <g font-family="Arial, sans-serif" font-size="12" fill="#526273" text-anchor="end">
+    <text x="61" y="374">0%</text><text x="61" y="310">20%</text>
+    <text x="61" y="246">40%</text><text x="61" y="182">60%</text>
+    <text x="61" y="118">80%</text><text x="61" y="54">100%</text>
+  </g>
+  <g fill="#277da1">
+    <rect x="88" y="118.54" width="52" height="251.46" rx="3"/>
+    <rect x="164" y="97.55" width="52" height="272.45" rx="3"/>
+    <rect x="240" y="138.90" width="52" height="231.10" rx="3"/>
+    <rect x="316" y="93.97" width="52" height="276.03" rx="3"/>
+    <rect x="392" y="106.77" width="52" height="263.23" rx="3"/>
+    <rect x="468" y="113.39" width="52" height="256.61" rx="3"/>
+    <rect x="544" y="108.43" width="52" height="261.57" rx="3"/>
+    <rect x="620" y="123.06" width="52" height="246.94" rx="3"/>
+    <rect x="696" y="99.41" width="52" height="270.59" rx="3"/>
+    <rect x="772" y="104.66" width="52" height="265.34" rx="3"/>
+  </g>
+  <line x1="70" y1="110.47" x2="865" y2="110.47" stroke="#f3722c" stroke-width="2.5" stroke-dasharray="7 5"/>
+  <rect x="710" y="60" width="144" height="29" rx="5" fill="#fff4ed"/>
+  <text x="782" y="79" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#c94f12">Mean: 81.10%</text>
+  <g font-family="Arial, sans-serif" font-size="11" fill="#182230" text-anchor="middle">
+    <text x="114" y="112">78.58</text><text x="190" y="91">85.14</text>
+    <text x="266" y="132">72.22</text><text x="342" y="87">86.26</text>
+    <text x="418" y="100">82.26</text><text x="494" y="107">80.19</text>
+    <text x="570" y="102">81.74</text><text x="646" y="117">77.17</text>
+    <text x="722" y="93">84.56</text><text x="798" y="98">82.92</text>
+  </g>
+  <g font-family="Arial, sans-serif" font-size="13" fill="#36485e" text-anchor="middle">
+    <text x="114" y="392">1</text><text x="190" y="392">2</text>
+    <text x="266" y="392">3</text><text x="342" y="392">4</text>
+    <text x="418" y="392">5</text><text x="494" y="392">6</text>
+    <text x="570" y="392">7</text><text x="646" y="392">8</text>
+    <text x="722" y="392">9</text><text x="798" y="392">10</text>
+    <text x="450" y="425" font-size="14">Official test fold</text>
+  </g>
+</svg>
